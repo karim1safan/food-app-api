@@ -24,7 +24,7 @@ app.use(morgan('dev'));
 // routes
 app.use("/api/v1/", require("./routes/testRoute"));
 app.use("/api/v1/auth", require("./routes/authRoute"));
-
+app.use("/api/v1/users", require("./routes/userRoute"))
 // start server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port.red}`.blue.italic.bold);

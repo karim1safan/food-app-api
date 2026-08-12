@@ -1,5 +1,7 @@
 const userModel = require("../models/userModel");
+const bcrypt = require("bcryptjs");
 
+// REGISTER
 const authController = async (req, res) => {
   try {
     const { username, email, password, address, phone } = req.body;
@@ -22,11 +24,15 @@ const authController = async (req, res) => {
       });
     }
 
+    // Hashing password
+    const salt = bcrypt.genSaltSync(10);
+    const hashPassword = await bcrypt.hash(password, salt);
+
     // create new user
     const newUser = await userModel.create({
       username,
       email,
-      password,
+      password: hashPassword,
       address,
       phone,
     });
@@ -44,6 +50,8 @@ const authController = async (req, res) => {
     });
   }
 };
+
+// LOGIN
 const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -57,12 +65,22 @@ const loginController = async (req, res) => {
     }
 
     // check user
-    const userExist = await userModel.findOne({ email, password });
+    const userExist = await userModel.findOne({ email });
 
     if (!userExist) {
       return res.status(404).json({
         success: false,
         message: "User not found!",
+      });
+    }
+
+    // check user password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(500).json({
+        success: false,
+        message: "Invalid Credentials!",
       });
     }
 

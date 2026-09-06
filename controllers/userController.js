@@ -171,11 +171,26 @@ const deleteUserConteroller = async (req, res) => {
       success: true,
       message: "User deleted successfully",
     });
-
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: "Error in Delete User API",
+      error: error.message,
+    });
+  }
+};
+
+// LOGOUT USER
+const logoutUserController = async (req, res) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error in Logout API",
       error: error.message,
     });
   }
@@ -187,4 +202,5 @@ module.exports = {
   updatePasswordController,
   resetPasswordController,
   deleteUserConteroller,
+  logoutUserController,
 };

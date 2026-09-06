@@ -3,9 +3,9 @@ const bcrypt = require("bcryptjs");
 const JWT = require("jsonwebtoken");
 
 // REGISTER
-const authController = async (req, res) => {
+const registerController = async (req, res) => {
   try {
-    const { username, email, password, address, phone } = req.body;
+    const { username, email, password, address, phone, answer } = req.body;
 
     // validation
     if (!username || !email || !password || !address || !phone) {
@@ -26,7 +26,7 @@ const authController = async (req, res) => {
     }
 
     // Hashing password
-    const salt = bcrypt.genSaltSync(10);
+    const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
     // create new user
@@ -36,9 +36,13 @@ const authController = async (req, res) => {
       password: hashPassword,
       address,
       phone,
+      answer
     });
 
-    res.status(200).json({
+    // Don't return password
+    newUser.password = undefined;
+
+    res.status(201).json({
       success: true,
       message: "Registration successful ",
       user: newUser,
@@ -65,7 +69,7 @@ const loginController = async (req, res) => {
       });
     }
 
-    // check user
+    // check user (email)
     const userExist = await userModel.findOne({ email });
 
     if (!userExist) {
@@ -81,7 +85,7 @@ const loginController = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid Credentials!",
+        message: "Invalid credentials!",
       });
     }
 
@@ -92,6 +96,7 @@ const loginController = async (req, res) => {
 
     // Dont't return password in the response
     userExist.password = undefined;
+
 
     res.status(200).json({
       success: true,
@@ -108,4 +113,4 @@ const loginController = async (req, res) => {
   }
 };
 
-module.exports = { authController, loginController };
+module.exports = { registerController, loginController };

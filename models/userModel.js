@@ -1,24 +1,37 @@
 const mongoose = require("mongoose");
 
 // Schema
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: [true, "username is required"] },
-  email: { type: String, required: [true, "email is required"], unique: true },
-  password: { type: String, required: [true, "password is required"] },
-  address: { type: Array, required: [true, "address is required"] },
-  phone: { type: String, required: [true, "phone is required"] },
-  usertype: {
-    type: String,
-    required: [true, "usertype is required"],
-    default: "client",
-    enum: ["client", "admin", "vendor", "driver"],
+const userSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: [true, "username is required"] },
+    email: {
+      type: String,
+      required: [true, "email is required"],
+      unique: true,
+    },
+    password: { type: String, required: [true, "password is required"] },
+    address: { type: Array, required: [true, "address is required"] },
+    phone: { type: String, required: [true, "phone is required"] },
+    usertype: {
+      type: String,
+      required: [true, "usertype is required"],
+      default: "Client",
+      enum: ["Client", "Admin", "Vendor", "Driver"],
+    },
+    profile: {
+      type: String,
+      default: "https://www.svgrepo.com/show/452030/avatar-default.svg",
+    },
+    answer: {
+      type: String,
+      required: [true, "Answer is required"],
+    },
   },
-  profile: {type: String, default: "https://www.svgrepo.com/show/452030/avatar-default.svg"},
-}, {timestamps: true});
+  { timestamps: true },
+);
 
-// export 
+// export
 module.exports = mongoose.model("User", userSchema);
-
 
 // {timestamps: true} is used to automatically add createdAt and updatedAt fields to the schema.
 

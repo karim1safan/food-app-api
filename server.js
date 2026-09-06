@@ -25,9 +25,9 @@ app.use(morgan("dev"));
 app.use(helmet()); // secure my app by setting various HTTP response headers
 
 // routes
-app.use("/api/v1/test", require("./routes/testRoute"));
-app.use("/api/v1/auth", require("./routes/authRoute"));
-app.use("/api/v1/user", require("./routes/userRoute"));
+app.use("/api/v1/test", require("./routes/testRoutes"));
+app.use("/api/v1/auth", require("./routes/authRoutes"));
+app.use("/api/v1/user", require("./routes/userRoutes"));
 
 // start server
 app.listen(port, () => {

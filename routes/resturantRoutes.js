@@ -4,7 +4,7 @@ const {
   createResturantConteroller,
   getAllResturantController,
   getResturantById,
-  deleteResturantConteroller,
+  deleteResturantController,
 } = require("../controllers/resturantController");
 const router = express.Router();
 
@@ -34,10 +34,10 @@ router.get("/get/:id", getResturantById);
 
 /**
  * @description Delete a resturant
- * @method DELET
+ * @method DELETE
  * @route /api/v1/resturant/delete/:id
- * @access Public
+ * @access private
  */
-router.delete("/delete/:id", deleteResturantConteroller);
+router.delete("/delete/:id", authMiddleware, deleteResturantController);
 
 module.exports = router;

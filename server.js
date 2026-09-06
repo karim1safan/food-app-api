@@ -28,6 +28,7 @@ app.use(helmet()); // secure my app by setting various HTTP response headers
 app.use("/api/v1/test", require("./routes/testRoutes"));
 app.use("/api/v1/auth", require("./routes/authRoutes"));
 app.use("/api/v1/user", require("./routes/userRoutes"));
+app.use("/api/v1/resturant", require("./routes/resturantRoutes"));
 
 // start server
 app.listen(port, () => {

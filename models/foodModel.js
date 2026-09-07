@@ -5,15 +5,15 @@ const foodSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Food name is require"],
+      required: [true, "The Food name is required"],
     },
     description: {
       type: String,
-      required: [true, " food description is requir"],
+      required: [true, " food description is required"],
     },
     price: {
       type: Number,
-      required: [true, "food price is require"],
+      required: [true, "food price is required"],
     },
     imageUrl: {
       type: String,
@@ -33,7 +33,7 @@ const foodSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    resturnat: {
+    resturant: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Resturant",
     },

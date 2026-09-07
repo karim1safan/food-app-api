@@ -5,6 +5,9 @@ const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
 
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./config/swagger");
+
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 
@@ -25,6 +28,7 @@ app.use(morgan("dev"));
 app.use(helmet()); // secure my app by setting various HTTP response headers
 
 // routes
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api/v1/test", require("./routes/testRoutes"));
 app.use("/api/v1/auth", require("./routes/authRoutes"));
 app.use("/api/v1/user", require("./routes/userRoutes"));
@@ -32,6 +36,7 @@ app.use("/api/v1/resturant", require("./routes/resturantRoutes"));
 app.use("/api/v1/category", require("./routes/categoryRoutes"));
 app.use("/api/v1/food", require("./routes/foodRoutes"));
 app.use("/api/v1/order", require("./routes/orderRoutes"));
+
 
 // start server
 app.listen(port, () => {

@@ -1,0 +1,627 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Food App API",
+    "version": "1.0.0",
+    "description": "REST API documentation for the Food Delivery Application."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    { "name": "Test" },
+    { "name": "Authentication" },
+    { "name": "Users" },
+    { "name": "Restaurants" },
+    { "name": "Categories" },
+    { "name": "Foods" },
+    { "name": "Orders" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "username": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "address": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "phone": { "type": "string" },
+          "usertype": {
+            "type": "string",
+            "enum": ["Client", "Admin", "Vendor", "Driver"]
+          }
+        }
+      },
+      "Food": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "price": { "type": "number", "minimum": 0 },
+          "imageUrl": { "type": "string" },
+          "foodTags": { "type": "string" },
+          "catgeory": { "type": "string" },
+          "isAvailabe": { "type": "boolean" },
+          "resturant": { "type": "string" },
+          "rating": { "type": "number" }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" },
+          "imageUrl": { "type": "string" }
+        }
+      },
+      "Restaurant": {
+        "type": "object",
+        "required": ["name", "coords"],
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" },
+          "imgURL": { "type": "string" },
+          "foods": { "type": "array", "items": {} },
+          "time": { "type": "string" },
+          "pickup": { "type": "boolean" },
+          "delivery": { "type": "boolean" },
+          "isOpen": { "type": "boolean" },
+          "logoURL": { "type": "string" },
+          "rating": { "type": "number" },
+          "coords": { "type": "object" }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "foods": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "payment": { "type": "object" },
+          "paymentStatus": {
+            "type": "string",
+            "enum": ["pending", "paid", "failed", "refunded"]
+          },
+          "totalAmount": { "type": "number", "minimum": 0 },
+          "deliveryAddress": { "type": "string" },
+          "notes": { "type": "string" },
+          "buyer": { "type": "string" },
+          "orderStatus": {
+            "type": "string",
+            "enum": ["preparing", "on the way", "delivered"]
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/test/": {
+      "get": {
+        "tags": ["Test"],
+        "summary": "Test the API",
+        "responses": {
+          "200": {
+            "description": "API is working"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "email",
+                  "password",
+                  "address",
+                  "phone",
+                  "answer"
+                ],
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" },
+                  "address": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "phone": { "type": "string" },
+                  "answer": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User registered successfully" },
+          "400": { "description": "Invalid input" }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/api/v1/user/getProfile": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get authenticated user profile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Profile returned" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/user/updateProfile": {
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update user profile",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "address": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profile updated" }
+        }
+      }
+    },
+    "/api/v1/user/updatePassword": {
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update password",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["oldPassword", "newPassword"],
+                "properties": {
+                  "oldPassword": { "type": "string" },
+                  "newPassword": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password updated" }
+        }
+      }
+    },
+    "/api/v1/user/resetPassword": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Reset password",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "answer", "newPassword"],
+                "properties": {
+                  "email": { "type": "string" },
+                  "answer": { "type": "string" },
+                  "newPassword": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset successfully" }
+        }
+      }
+    },
+    "/api/v1/user/deleteProfile": {
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete user profile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Profile deleted" }
+        }
+      }
+    },
+    "/api/v1/user/logout": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Logout user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Logout successful" }
+        }
+      }
+    },
+    "/api/v1/resturant/create": {
+      "post": {
+        "tags": ["Restaurants"],
+        "summary": "Create restaurant",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Restaurant" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Restaurant created" }
+        }
+      }
+    },
+    "/api/v1/resturant/getAll": {
+      "get": {
+        "tags": ["Restaurants"],
+        "summary": "Get all restaurants",
+        "responses": {
+          "200": { "description": "Restaurants returned" }
+        }
+      }
+    },
+    "/api/v1/resturant/get/{id}": {
+      "get": {
+        "tags": ["Restaurants"],
+        "summary": "Get restaurant by ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Restaurant returned" },
+          "404": { "description": "Restaurant not found" }
+        }
+      }
+    },
+    "/api/v1/resturant/delete/{id}": {
+      "delete": {
+        "tags": ["Restaurants"],
+        "summary": "Delete restaurant",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Restaurant deleted" }
+        }
+      }
+    },
+    "/api/v1/category/create": {
+      "post": {
+        "tags": ["Categories"],
+        "summary": "Create category",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Category" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Category created" }
+        }
+      }
+    },
+    "/api/v1/category/getAll": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Get all categories",
+        "responses": {
+          "200": { "description": "Categories returned" }
+        }
+      }
+    },
+    "/api/v1/category/get/{id}": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Get category by ID",
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "responses": {
+          "200": { "description": "Category returned" }
+        }
+      }
+    },
+    "/api/v1/category/update/{id}": {
+      "put": {
+        "tags": ["Categories"],
+        "summary": "Update category",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Category" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Category updated" }
+        }
+      }
+    },
+    "/api/v1/category/delete/{id}": {
+      "delete": {
+        "tags": ["Categories"],
+        "summary": "Delete category",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "responses": {
+          "200": { "description": "Category deleted" }
+        }
+      }
+    },
+    "/api/v1/food/create": {
+      "post": {
+        "tags": ["Foods"],
+        "summary": "Create food",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Food" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Food created" }
+        }
+      }
+    },
+    "/api/v1/food/getAll": {
+      "get": {
+        "tags": ["Foods"],
+        "summary": "Get all foods",
+        "responses": {
+          "200": { "description": "Foods returned" }
+        }
+      }
+    },
+    "/api/v1/food/get/{id}": {
+      "get": {
+        "tags": ["Foods"],
+        "summary": "Get food by ID",
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "responses": {
+          "200": { "description": "Food returned" }
+        }
+      }
+    },
+    "/api/v1/food/getByRestaurant/{id}": {
+      "get": {
+        "tags": ["Foods"],
+        "summary": "Get foods by restaurant ID",
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "responses": {
+          "200": { "description": "Foods returned" }
+        }
+      }
+    },
+    "/api/v1/food/getRandom": {
+      "get": {
+        "tags": ["Foods"],
+        "summary": "Get random food",
+        "responses": {
+          "200": { "description": "Random food returned" }
+        }
+      }
+    },
+    "/api/v1/food/update/{id}": {
+      "put": {
+        "tags": ["Foods"],
+        "summary": "Update food",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Food" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Food updated" }
+        }
+      }
+    },
+    "/api/v1/food/delete/{id}": {
+      "delete": {
+        "tags": ["Foods"],
+        "summary": "Delete food",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "responses": {
+          "200": { "description": "Food deleted" }
+        }
+      }
+    },
+    "/api/v1/order/createOrder": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Create order",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["foods", "deliveryAddress"],
+                "properties": {
+                  "foods": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "payment": { "type": "object" },
+                  "deliveryAddress": { "type": "string" },
+                  "notes": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Order created" },
+          "400": { "description": "Invalid food items or missing data" }
+        }
+      }
+    },
+    "/api/v1/order/getAllOrders": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Get all orders",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Orders returned" }
+        }
+      }
+    },
+    "/api/v1/order/getOrder/{id}": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Get order by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "responses": {
+          "200": { "description": "Order returned" }
+        }
+      }
+    },
+    "/api/v1/order/updateOrder/{id}": {
+      "put": {
+        "tags": ["Orders"],
+        "summary": "Update order",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Order" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Order updated" }
+        }
+      }
+    },
+    "/api/v1/order/deleteOrder/{id}": {
+      "delete": {
+        "tags": ["Orders"],
+        "summary": "Delete order",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "responses": {
+          "200": { "description": "Order deleted" }
+        }
+      }
+    },
+    "/api/v1/order/admin/order/status/{id}": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Update order status",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/id" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["orderStatus"],
+                "properties": {
+                  "orderStatus": {
+                    "type": "string",
+                    "enum": ["preparing", "on the way", "delivered"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Order status updated" },
+          "403": { "description": "Admin access required" }
+        }
+      }
+    }
+  }
+}

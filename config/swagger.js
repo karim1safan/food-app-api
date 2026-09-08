@@ -1,4 +1,4 @@
-const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerDocument = require("./swagger.json");
 
 const options = {
   definition: {
@@ -27,4 +27,4 @@ const options = {
   apis: ["./routes/*.js"],
 };
 
-module.exports = swaggerJsdoc(options);
+module.exports = swaggerDocument;
